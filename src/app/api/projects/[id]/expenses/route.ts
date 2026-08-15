@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import Expense, { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/models/Expense";
+import Expense, { EXPENSE_CATEGORIES, PAYMENT_METHODS, ExpenseDocument } from "@/models/Expense";
 import Project from "@/models/Project";
 
 interface Params {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       query.date = dateFilter;
     }
 
-    const expenses = await Expense.find(query).sort({ date: -1 }).lean();
+    const expenses = await Expense.find(query).sort({ date: -1 }).lean<ExpenseDocument[]>();
 
     return NextResponse.json({ success: true, data: expenses });
   } catch (error) {

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import Project from "@/models/Project";
-import Expense from "@/models/Expense";
-import Attendance from "@/models/Attendance";
+import Project, { ProjectDocument } from "@/models/Project";
+import Expense, { ExpenseDocument } from "@/models/Expense";
+import Attendance, { AttendanceDocument } from "@/models/Attendance";
 import { buildProjectSummary } from "@/lib/calculations";
 
 // GET /api/projects - list all projects, each with a computed financial summary
@@ -24,14 +24,14 @@ export async function GET(req: NextRequest) {
       query.status = status;
     }
 
-    const projects = await Project.find(query).lean();
+    const projects = await Project.find(query).lean<ProjectDocument[]>();
 
     // Compute financial summary for every project in parallel
     const projectsWithSummary = await Promise.all(
       projects.map(async (project) => {
         const [expenses, attendance] = await Promise.all([
-          Expense.find({ projectId: project._id }).lean(),
-          Attendance.find({ projectId: project._id }).lean(),
+          Expense.find({ projectId: project._id }).lean<ExpenseDocument[]>(),
+          Attendance.find({ projectId: project._id }).lean<AttendanceDocument[]>(),
         ]);
 
         const summary = buildProjectSummary(

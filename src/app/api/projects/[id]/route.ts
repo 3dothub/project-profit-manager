@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import Project from "@/models/Project";
+import Project, { ProjectDocument } from "@/models/Project";
 import Expense from "@/models/Expense";
 import Employee from "@/models/Employee";
 import Attendance from "@/models/Attendance";
@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ success: false, error: "Invalid project id" }, { status: 400 });
     }
 
-    const project = await Project.findById(id).lean();
+    const project = await Project.findById(id).lean<ProjectDocument | null>();
     if (!project) {
       return NextResponse.json({ success: false, error: "Project not found" }, { status: 404 });
     }

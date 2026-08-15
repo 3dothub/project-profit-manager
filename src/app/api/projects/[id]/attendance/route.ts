@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import Attendance from "@/models/Attendance";
-import Employee from "@/models/Employee";
+import Attendance, { AttendanceDocument } from "@/models/Attendance";
+import Employee, { EmployeeDocument } from "@/models/Employee";
 import { calculateAttendanceSalary } from "@/lib/calculations";
 
 interface Params {
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       if (to) dateFilter.$lte = new Date(to);
       const records = await Attendance.find({ projectId: id, date: dateFilter })
         .sort({ date: -1 })
-        .lean();
+        .lean<AttendanceDocument[]>();
       return NextResponse.json({ success: true, data: records });
     }
 
@@ -44,8 +44,8 @@ export async function GET(req: NextRequest, { params }: Params) {
     dayEnd.setHours(23, 59, 59, 999);
 
     const [employees, records] = await Promise.all([
-      Employee.find({ projectId: id }).lean(),
-      Attendance.find({ projectId: id, date: { $gte: dayStart, $lte: dayEnd } }).lean(),
+      Employee.find({ projectId: id }).lean<EmployeeDocument[]>(),
+      Attendance.find({ projectId: id, date: { $gte: dayStart, $lte: dayEnd } }).lean<AttendanceDocument[]>(),
     ]);
 
     const recordsByEmployee = new Map(records.map((r) => [r.employeeId.toString(), r]));

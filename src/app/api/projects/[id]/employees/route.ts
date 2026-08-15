@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import Employee from "@/models/Employee";
+import Employee, { EmployeeDocument } from "@/models/Employee";
 import Project from "@/models/Project";
 
 interface Params {
@@ -18,7 +18,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ success: false, error: "Invalid project id" }, { status: 400 });
     }
 
-    const employees = await Employee.find({ projectId: id }).sort({ createdAt: -1 }).lean();
+    const employees = await Employee.find({ projectId: id }).sort({ createdAt: -1 }).lean<EmployeeDocument[]>();
     return NextResponse.json({ success: true, data: employees });
   } catch (error) {
     console.error("GET employees error:", error);
