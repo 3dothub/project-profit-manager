@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Link from "next/link";
 import {
   Wallet,
   Receipt,
@@ -15,6 +16,7 @@ import {
   Trash2,
   IndianRupee,
   Landmark,
+  HandCoins,
 } from "lucide-react";
 import SummaryCard from "@/components/dashboard/SummaryCard";
 import BudgetHealthBadge from "@/components/ui/BudgetHealthBadge";
@@ -144,6 +146,26 @@ export default function ProjectDashboardPage() {
         </div>
       </div>
 
+      {/* Payroll — wages earned vs actually paid out to workers */}
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Payroll</h2>
+          <Link href={`/projects/${project._id}/employees`} className="text-xs font-medium text-brand-700 hover:underline">
+            Manage employees →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <SummaryCard label="Salary Earned" value={formatCurrency(summary.totalSalary)} icon={Users} />
+          <SummaryCard label="Salary Paid Out" value={formatCurrency(summary.totalSalaryPaid)} icon={HandCoins} tone="positive" />
+          <SummaryCard
+            label="Salary Pending"
+            value={formatCurrency(summary.pendingSalary)}
+            icon={summary.pendingSalary > 0 ? TrendingDown : TrendingUp}
+            tone={summary.pendingSalary > 0 ? "negative" : "default"}
+          />
+        </div>
+      </div>
+
       {/* Cash & collections — the real money-in-hand picture */}
       <div>
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Cash &amp; Collections</h2>
@@ -205,7 +227,7 @@ export default function ProjectDashboardPage() {
       <ConfirmDeleteModal
         open={showDelete}
         title="Delete project"
-        message={`Delete "${project.name}"? This permanently removes the project along with all of its expenses, employees, attendance records, and payments. This action cannot be undone.`}
+        message={`Delete "${project.name}"? This permanently removes the project along with all of its expenses, employees, attendance records, client payments, and salary payments. This action cannot be undone.`}
         loading={deleting}
         onCancel={() => setShowDelete(false)}
         onConfirm={handleDeleteProject}

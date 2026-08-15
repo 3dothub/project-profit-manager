@@ -35,6 +35,10 @@ export interface ProjectSummary {
   /** totalSpent / budget * 100 — drives the on-track / near-budget / over-budget badge. */
   budgetUsedPercentage: number;
   budgetHealth: BudgetHealth;
+  /** Total actually paid out to employees so far (subset of totalSalary, which is accrued/earned). */
+  totalSalaryPaid: number;
+  /** totalSalary - totalSalaryPaid: wages earned but not yet paid out. Does not affect profit/cashPosition. */
+  pendingSalary: number;
 }
 
 export interface ProjectWithSummary extends IProject {

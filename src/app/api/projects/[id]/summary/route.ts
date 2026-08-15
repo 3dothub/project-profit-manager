@@ -5,6 +5,7 @@ import Project, { ProjectDocument } from "@/models/Project";
 import Expense, { ExpenseDocument } from "@/models/Expense";
 import Attendance, { AttendanceDocument } from "@/models/Attendance";
 import Payment, { PaymentDocument } from "@/models/Payment";
+import SalaryPayment, { SalaryPaymentDocument } from "@/models/SalaryPayment";
 import { buildProjectSummary } from "@/lib/calculations";
 
 interface Params {
@@ -32,17 +33,19 @@ export async function GET(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ success: false, error: "Project not found" }, { status: 404 });
     }
 
-    const [expenses, attendance, payments] = await Promise.all([
+    const [expenses, attendance, payments, salaryPayments] = await Promise.all([
       Expense.find({ projectId: id }).lean<ExpenseDocument[]>(),
       Attendance.find({ projectId: id }).lean<AttendanceDocument[]>(),
       Payment.find({ projectId: id }).lean<PaymentDocument[]>(),
+      SalaryPayment.find({ projectId: id }).lean<SalaryPaymentDocument[]>(),
     ]);
 
     const summary = buildProjectSummary(
       project.budget,
       expenses.map((e) => e.amount),
       attendance.map((a) => a.salary),
-      payments.map((p) => p.amount)
+      payments.map((p) => p.amount),
+      salaryPayments.map((p) => p.amount)
     );
 
     // Expense category breakdown

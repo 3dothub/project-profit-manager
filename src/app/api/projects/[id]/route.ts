@@ -6,6 +6,7 @@ import Expense from "@/models/Expense";
 import Employee from "@/models/Employee";
 import Attendance from "@/models/Attendance";
 import Payment from "@/models/Payment";
+import SalaryPayment from "@/models/SalaryPayment";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -102,6 +103,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
       Employee.deleteMany({ projectId: id }),
       Attendance.deleteMany({ projectId: id }),
       Payment.deleteMany({ projectId: id }),
+      SalaryPayment.deleteMany({ projectId: id }),
       Project.findByIdAndDelete(id),
     ]);
 

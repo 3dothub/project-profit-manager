@@ -8,9 +8,10 @@ import AddProjectModal from "@/components/projects/AddProjectModal";
 import SummaryCard from "@/components/dashboard/SummaryCard";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import EmptyState from "@/components/ui/EmptyState";
+import FAB from "@/components/ui/FAB";
 import { ProjectWithSummary } from "@/types/project";
 import { formatCurrency } from "@/lib/calculations";
-import { FolderPlus, Wallet, PiggyBank, TrendingUp, TrendingDown, Landmark } from "lucide-react";
+import { FolderPlus, Wallet, PiggyBank, TrendingUp, TrendingDown, Landmark, HandCoins } from "lucide-react";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectWithSummary[]>([]);
@@ -55,9 +56,10 @@ export default function ProjectsPage() {
         acc.spent += p.summary.totalSpent;
         acc.profit += p.summary.profit;
         acc.outstanding += Math.max(p.summary.outstandingBalance, 0);
+        acc.salaryPending += p.summary.pendingSalary;
         return acc;
       },
-      { budget: 0, spent: 0, profit: 0, outstanding: 0 }
+      { budget: 0, spent: 0, profit: 0, outstanding: 0, salaryPending: 0 }
     );
   }, [projects]);
   const profitPositive = totals.profit >= 0;
@@ -69,14 +71,14 @@ export default function ProjectsPage() {
           <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
           <p className="text-sm text-gray-500">Track budgets, expenses, salaries and profit for every project.</p>
         </div>
-        <button className="btn-primary" onClick={() => setShowModal(true)}>
+        <button className="btn-primary hidden sm:inline-flex" onClick={() => setShowModal(true)}>
           <Plus className="h-4 w-4" /> Add Project
         </button>
       </div>
 
       {/* Cross-project overview */}
       {!loading && projects.length > 0 && (
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <SummaryCard label="Total Budget" value={formatCurrency(totals.budget)} icon={Wallet} tone="brand" />
           <SummaryCard label="Total Spent" value={formatCurrency(totals.spent)} icon={PiggyBank} />
           <SummaryCard
@@ -86,6 +88,12 @@ export default function ProjectsPage() {
             tone={profitPositive ? "positive" : "negative"}
           />
           <SummaryCard label="Outstanding (Due)" value={formatCurrency(totals.outstanding)} icon={Landmark} />
+          <SummaryCard
+            label="Salary Pending"
+            value={formatCurrency(totals.salaryPending)}
+            icon={HandCoins}
+            tone={totals.salaryPending > 0 ? "negative" : "default"}
+          />
         </div>
       )}
 
@@ -189,6 +197,8 @@ export default function ProjectsPage() {
           onCreated={() => fetchProjects()}
         />
       )}
+
+      <FAB label="Add Project" onClick={() => setShowModal(true)} aboveTabBar={false} />
     </div>
   );
 }

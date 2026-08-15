@@ -8,6 +8,7 @@ import PaymentModal from "@/components/payments/PaymentModal";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import EmptyState from "@/components/ui/EmptyState";
+import FAB from "@/components/ui/FAB";
 import { IPayment } from "@/types/payment";
 import { formatDate } from "@/lib/calculations";
 import { downloadCSV } from "@/lib/csv";
@@ -81,7 +82,7 @@ export default function PaymentsPage() {
             </button>
           )}
           <button
-            className="btn-primary"
+            className="btn-primary hidden sm:inline-flex"
             onClick={() => {
               setEditingPayment(null);
               setShowModal(true);
@@ -133,6 +134,14 @@ export default function PaymentsPage() {
         loading={deleting}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
+      />
+
+      <FAB
+        label="Record Payment"
+        onClick={() => {
+          setEditingPayment(null);
+          setShowModal(true);
+        }}
       />
     </div>
   );

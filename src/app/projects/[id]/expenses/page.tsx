@@ -8,6 +8,7 @@ import ExpenseModal from "@/components/expenses/ExpenseModal";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import EmptyState from "@/components/ui/EmptyState";
+import FAB from "@/components/ui/FAB";
 import { IExpense } from "@/types/expense";
 import { formatDate } from "@/lib/calculations";
 import { downloadCSV } from "@/lib/csv";
@@ -82,7 +83,7 @@ export default function ExpensesPage() {
             </button>
           )}
           <button
-            className="btn-primary"
+            className="btn-primary hidden sm:inline-flex"
             onClick={() => {
               setEditingExpense(null);
               setShowModal(true);
@@ -134,6 +135,14 @@ export default function ExpensesPage() {
         loading={deleting}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
+      />
+
+      <FAB
+        label="Add Expense"
+        onClick={() => {
+          setEditingExpense(null);
+          setShowModal(true);
+        }}
       />
     </div>
   );

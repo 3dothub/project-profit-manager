@@ -39,22 +39,30 @@ export function getBudgetHealth(budgetUsedPercentage: number): BudgetHealth {
 
 /**
  * Builds the full financial summary for a project given its raw expense
- * amounts, attendance salary amounts, and client payment amounts. This is
- * the single source of truth for the profit formula used across the
- * dashboard, project list, and summary API.
+ * amounts, attendance salary amounts, client payment amounts, and salary
+ * payout amounts. This is the single source of truth for the profit formula
+ * used across the dashboard, project list, and summary API.
  *
- * Two distinct "profit" concepts are surfaced on purpose:
+ * Several distinct concepts are surfaced on purpose, rather than collapsed
+ * into one "profit" number:
  * - `profit` (budget - spent): the cost-accounting view, assuming the full
- *   contracted budget will eventually be collected from the client.
+ *   contracted budget will eventually be collected from the client, and
+ *   that all earned salary counts as a real cost whether or not it has
+ *   actually been paid out yet.
  * - `cashPosition` (received - spent): the real cash-in-hand view today,
  *   which is what actually matters for day-to-day decisions early in a
  *   project when collections lag spending.
+ * - `pendingSalary` (earned - paid): what is still owed to workers — this
+ *   does NOT change `profit` or `cashPosition` (earned salary is already
+ *   counted as spent the moment it's earned), it's purely a payroll
+ *   liability figure so a contractor can see who still needs to be paid.
  */
 export function buildProjectSummary(
   budget: number,
   expenseAmounts: number[],
   salaryAmounts: number[],
-  paymentAmounts: number[] = []
+  paymentAmounts: number[] = [],
+  salaryPaidAmounts: number[] = []
 ): ProjectSummary {
   const totalExpenses = sum(expenseAmounts);
   const totalSalary = sum(salaryAmounts);
@@ -71,6 +79,9 @@ export function buildProjectSummary(
   const budgetUsedPercentage = budget > 0 ? (totalSpent / budget) * 100 : 0;
   const budgetHealth = getBudgetHealth(budgetUsedPercentage);
 
+  const totalSalaryPaid = sum(salaryPaidAmounts);
+  const pendingSalary = Math.max(totalSalary - totalSalaryPaid, 0);
+
   return {
     budget,
     totalExpenses,
@@ -85,6 +96,19 @@ export function buildProjectSummary(
     cashPosition,
     budgetUsedPercentage,
     budgetHealth,
+    totalSalaryPaid,
+    pendingSalary,
+  };
+}
+
+/** Per-employee earned / paid / pending salary breakdown. */
+export function buildEmployeeSalarySummary(earnedAmounts: number[], paidAmounts: number[]) {
+  const totalEarned = sum(earnedAmounts);
+  const totalPaid = sum(paidAmounts);
+  return {
+    totalEarned,
+    totalPaid,
+    pending: Math.max(totalEarned - totalPaid, 0),
   };
 }
 
