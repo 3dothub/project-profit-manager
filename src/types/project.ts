@@ -12,6 +12,9 @@ export interface IProject {
   updatedAt: string;
 }
 
+/** Where a project stands against its budget, used to drive the health badge. */
+export type BudgetHealth = "on-track" | "near-budget" | "over-budget";
+
 export interface ProjectSummary {
   budget: number;
   totalExpenses: number;
@@ -20,6 +23,18 @@ export interface ProjectSummary {
   remainingBudget: number;
   profit: number;
   profitPercentage: number;
+  /** Total amount the client has actually paid so far. */
+  totalReceived: number;
+  /** Budget - totalReceived: what the client still owes. Negative means overpaid. */
+  outstandingBalance: number;
+  /** totalReceived / budget * 100 */
+  collectionPercentage: number;
+  /** totalReceived - totalSpent: real cash position today (can differ a lot from `profit`,
+   *  which assumes the full budget will eventually be collected). */
+  cashPosition: number;
+  /** totalSpent / budget * 100 — drives the on-track / near-budget / over-budget badge. */
+  budgetUsedPercentage: number;
+  budgetHealth: BudgetHealth;
 }
 
 export interface ProjectWithSummary extends IProject {
