@@ -35,7 +35,7 @@ interface DailyPoint {
   salary: number;
   total: number;
 }
-
+console.log("Test");
 // 1. Expense vs Salary — bar chart
 export function ExpenseVsSalaryChart({ data }: { data: NamedValue[] }) {
   return (
