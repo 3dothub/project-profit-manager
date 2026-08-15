@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import Project from "@/models/Project";
-import Expense from "@/models/Expense";
-import Attendance from "@/models/Attendance";
-import { buildProjectSummary, sum } from "@/lib/calculations";
+import Project, { ProjectDocument } from "@/models/Project";
+import Expense, { ExpenseDocument } from "@/models/Expense";
+import Attendance, { AttendanceDocument } from "@/models/Attendance";
+import { buildProjectSummary } from "@/lib/calculations";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -25,14 +25,14 @@ export async function GET(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ success: false, error: "Invalid project id" }, { status: 400 });
     }
 
-    const project = await Project.findById(id).lean();
+    const project = await Project.findById(id).lean<ProjectDocument | null>();
     if (!project) {
       return NextResponse.json({ success: false, error: "Project not found" }, { status: 404 });
     }
 
     const [expenses, attendance] = await Promise.all([
-      Expense.find({ projectId: id }).lean(),
-      Attendance.find({ projectId: id }).lean(),
+      Expense.find({ projectId: id }).lean<ExpenseDocument[]>(),
+      Attendance.find({ projectId: id }).lean<AttendanceDocument[]>(),
     ]);
 
     const summary = buildProjectSummary(
@@ -98,6 +98,3 @@ export async function GET(_req: NextRequest, { params }: Params) {
     return NextResponse.json({ success: false, error: "Failed to fetch summary" }, { status: 500 });
   }
 }
-
-// Not used directly but exported for reuse/testing of the raw sum helper
-export { sum };
