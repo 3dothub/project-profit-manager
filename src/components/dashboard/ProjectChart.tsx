@@ -43,13 +43,13 @@ interface DailyPoint {
   total: number;
 }
 
+
 interface CashFlowPoint {
   date: string;
   spent: number;
   received: number;
 }
 
-// 1. Expense vs Salary — bar chart
 export function ExpenseVsSalaryChart({ data }: { data: NamedValue[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
